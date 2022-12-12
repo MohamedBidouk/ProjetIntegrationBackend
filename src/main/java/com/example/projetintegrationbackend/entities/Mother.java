@@ -1,5 +1,6 @@
 package com.example.projetintegrationbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ public class Mother {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "id_mother")
     private Long id;
 
     private String firstnameMother;
@@ -27,8 +28,15 @@ public class Mother {
     private String zipOfOriginMother;
     private String stateOfOriginMother;
     private String statusMother;
-
-    @OneToOne(mappedBy = "mother")
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "candidate_id")
     private Candidate candidate;
+
+    public Mother (String firstnameMother, String lastnameMother){
+        this.firstnameMother = firstnameMother;
+        this.lastnameMother = lastnameMother;
+    }
 }
     

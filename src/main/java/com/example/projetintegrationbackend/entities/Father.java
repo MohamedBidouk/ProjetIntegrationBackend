@@ -1,5 +1,6 @@
 package com.example.projetintegrationbackend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,7 @@ public class Father {
     private String zipOfOriginFather;
     private String stateOfOriginFather;
     private String statusFather;
-
+    @JsonBackReference
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "candidate_id")

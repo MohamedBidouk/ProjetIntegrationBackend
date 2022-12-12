@@ -1,6 +1,7 @@
 package com.example.projetintegrationbackend.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,18 +32,16 @@ public class Candidate {
     private String zipOfStudy;
     private String sexe;
     private String status;
-
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "mother_id", referencedColumnName = "id")
+    @JoinColumn(name = "id", referencedColumnName = "id_mother")
     private Mother mother;
 
-
+    @JsonManagedReference
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id", referencedColumnName = "id")
     private Father father;
 
-    @OneToMany(mappedBy="candidate")
-    private List<File> items;
 
     public Candidate(int CIN, String firstname, String lastname) {
         this.CIN = CIN;
