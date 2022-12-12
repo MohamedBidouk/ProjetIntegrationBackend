@@ -1,45 +1,41 @@
 package com.example.projetintegrationbackend.restcontroller;
 
-import com.example.projetintegrationbackend.entities.Candidate;
-import com.example.projetintegrationbackend.entities.FileDB;
+
+import com.example.projetintegrationbackend.entities.Father;
+
+import com.example.projetintegrationbackend.entities.FileDBFather;
 import com.example.projetintegrationbackend.exception.ResourceNotFoundException;
 import com.example.projetintegrationbackend.message.ResponseFile;
 import com.example.projetintegrationbackend.message.ResponseMessage;
-import com.example.projetintegrationbackend.repos.CandidateRepository;
-import com.example.projetintegrationbackend.repos.FileDBRepository;
-import com.example.projetintegrationbackend.service.FileStorageService;
+import com.example.projetintegrationbackend.repos.FatherRepository;
+import com.example.projetintegrationbackend.service.FileFatherStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
 @CrossOrigin("http://localhost:8081")
-public class FileController {
+public class FileFatherController {
+    @Autowired
+    private FileFatherStorageService fileFatherStorageService;
+    @Autowired
+    private FatherRepository fatherRepository;
 
-    @Autowired
-    private FileStorageService storageService;
-    @Autowired
-    private FileDBRepository fileDBRepository;
-    @Autowired
-    private CandidateRepository candidateRepository;
-
-    @PostMapping("/candidate/{candidateId}/upload")
-    public ResponseEntity<ResponseMessage> uploadFile(@PathVariable(value = "candidateId")Long candidateId,
+    @PostMapping("/father/{fatherId}/upload")
+    public ResponseEntity<ResponseMessage> uploadFile(@PathVariable(value = "fatherId")Long fatherId,
                                                       @RequestParam("file") MultipartFile file) {
         String message = "";
         try {
-                Candidate candidate = candidateRepository.findById(candidateId).get();
-                storageService.store(file, candidate);
+            Father father = fatherRepository.findById(fatherId).get();
+            fileFatherStorageService.store(file, father);
 
             message = "Uploaded the file successfully: " + file.getOriginalFilename();
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
@@ -49,12 +45,12 @@ public class FileController {
         }
     }
 
-    @GetMapping("/candidate/{candidateId}/filess")
-    public ResponseEntity<List<ResponseFile>> getAllFilesByCandidate(@PathVariable(value = "candidateId") Long candidateId) {
-        if(!candidateRepository.existsById(candidateId)){
-            throw new ResourceNotFoundException("Not found Candidate with id = " + candidateId);
+    @GetMapping("/father/{fatherId}/filesFather")
+    public ResponseEntity<List<ResponseFile>> getAllFilesByCandidate(@PathVariable(value = "fatherId") Long fatherId) {
+        if(!fatherRepository.existsById(fatherId)){
+            throw new ResourceNotFoundException("Not found Candidate with id = " + fatherId);
         }
-        List<ResponseFile> files = storageService.getAllFilesByCandidate(candidateId).map(dbFile -> {
+        List<ResponseFile> files = fileFatherStorageService.getAllFilesByFather(fatherId).map(dbFile -> {
             String fileDownloadUri = ServletUriComponentsBuilder
                     .fromCurrentContextPath()
                     .path("/files/")
@@ -71,12 +67,12 @@ public class FileController {
         return ResponseEntity.status(HttpStatus.OK).body(files);
     }
 
-    @GetMapping("/files/{id}")
+    @GetMapping("/filesFather/{id}")
     public ResponseEntity<byte[]> getFile(@PathVariable String id) {
-        FileDB fileDB = storageService.getFile(id);
+        FileDBFather fileDBFather = fileFatherStorageService.getFile(id);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDB.getName() + "\"")
-                .body(fileDB.getData());
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDBFather.getName() + "\"")
+                .body(fileDBFather.getData());
     }
 }
